@@ -163,6 +163,8 @@ func (handler *NewTranstatorHandler) validateRequestBody(reqObject interface{}) 
 			if strings.Contains(reqType.EnglishWord, "'") {
 				return `You must provide an english word without apostrophes! Example JSON - {"english-word":"apple"}`
 			}
+			
+			break
 		case models.TranslationSentence:
 			if reqType.EnglishSentence == "" {
 				return `You must provide an english sentence to translate! Example JSON - {"english-sentence":"Apples are sweet!"}`
