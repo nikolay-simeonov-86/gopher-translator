@@ -1,0 +1,5 @@
+package handlers
+
+var AddNewWordTranslation = addNewWordTranslation
+var AddNewSentenceTranslation = addNewSentenceTranslation
+var ValidateRequestBody = validateRequestBody

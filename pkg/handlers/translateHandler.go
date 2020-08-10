@@ -57,7 +57,7 @@ func (handler *NewTranstatorHandler) TranslateWord() http.HandlerFunc {
 			return
 		}
 
-		errorString := handler.validateRequestBody(translationReq)
+		errorString := validateRequestBody(translationReq)
 		if errorString != "" {
 			json.NewEncoder(w).Encode(map[string]string{"error":errorString})
 			return
@@ -69,7 +69,7 @@ func (handler *NewTranstatorHandler) TranslateWord() http.HandlerFunc {
 			return
 		}
 
-		newTranslation, err := handler.addNewWordTranslation(translationReq.EnglishWord);
+		newTranslation, err := addNewWordTranslation(translationReq.EnglishWord, handler.translator, handler.repository);
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]string{"error":"Could not create new word translation!"})
 			return
@@ -89,7 +89,7 @@ func (handler *NewTranstatorHandler) TranslateSentence() http.HandlerFunc {
 			return
 		}
 
-		errorString := handler.validateRequestBody(translationReq)
+		errorString := validateRequestBody(translationReq)
 		if errorString != "" {
 			json.NewEncoder(w).Encode(map[string]string{"error":errorString})
 			return
@@ -101,7 +101,7 @@ func (handler *NewTranstatorHandler) TranslateSentence() http.HandlerFunc {
 			return
 		}
 
-		newTranslation, err := handler.addNewSentenceTranslation(translationReq.EnglishSentence);
+		newTranslation, err := addNewSentenceTranslation(translationReq.EnglishSentence, handler.translator, handler.repository);
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]string{"error":"Could not create new sentence translation!"})
 			return
@@ -119,11 +119,11 @@ func (handler *NewTranstatorHandler) TranslateHistory() http.HandlerFunc {
 }
 
 // addNewWordTranslation Adds new translation in the storage
-func (handler *NewTranstatorHandler) addNewWordTranslation(key string) (translation models.TranslationWord, err error) {
+func addNewWordTranslation(key string, translator translation.GopherTranslator, repository storage.Repository) (translation models.TranslationWord, err error) {
 	translation = models.TranslationWord{EnglishWord: key,}
-	gopherWord := handler.translator.TranslateEnglishWordToGopher(key);
+	gopherWord := translator.TranslateEnglishWordToGopher(key);
 	translation.GopherWord = gopherWord
-	err = handler.repository.AddWordTranslation(translation)
+	err = repository.AddWordTranslation(translation)
 	if err != nil {
 		return translation, err
 	}
@@ -134,11 +134,11 @@ func (handler *NewTranstatorHandler) addNewWordTranslation(key string) (translat
 }
 
 // addNewSentenceTranslation Adds new translation in the storage
-func (handler *NewTranstatorHandler) addNewSentenceTranslation(key string) (translation models.TranslationSentence, err error) {
+func addNewSentenceTranslation(key string, translator translation.GopherTranslator, repository storage.Repository) (translation models.TranslationSentence, err error) {
 	translation = models.TranslationSentence{EnglishSentence: key,}
-	gopherSentence := handler.translator.TranslateEnglishSentenceToGopher(key);
+	gopherSentence := translator.TranslateEnglishSentenceToGopher(key);
 	translation.GopherSentence = gopherSentence
-	err = handler.repository.AddSentenceTranslation(translation)
+	err = repository.AddSentenceTranslation(translation)
 	if err != nil {
 		return translation, err
 	}
@@ -149,7 +149,7 @@ func (handler *NewTranstatorHandler) addNewSentenceTranslation(key string) (tran
 }
 
 // validateRequestBody validates the request body if it is empty or has apostrophes
-func (handler *NewTranstatorHandler) validateRequestBody(reqObject interface{}) string {
+func validateRequestBody(reqObject interface{}) string {
 	switch reqType := reqObject.(type) {
 		case models.TranslationWord:
 			if reqType.EnglishWord == "" {

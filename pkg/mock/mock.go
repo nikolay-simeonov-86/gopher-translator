@@ -84,3 +84,9 @@ func (mock *NewMock) TranslateEnglishSentenceToGopher(englishSentence string) st
 	translator := translation.CreateNewGopherTranslator()
 	return translator.TranslateEnglishSentenceToGopher(englishSentence)
 }
+
+// GetAllTranslationHistoryRecords returns all translations
+func (mock *NewMock) GetAllTranslationHistoryRecords() models.TranslationHistoryList {
+	repository := storage.CreateNewRedisStorage("localhost:6379","",0)
+	return repository.GetAllTranslations()
+}
