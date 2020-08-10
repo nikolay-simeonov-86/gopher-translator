@@ -14,9 +14,9 @@ import (
 // TranstatorHandler Handles translate routes
 type TranstatorHandler interface {
 	Welcome() http.HandlerFunc
-	TranslateWord(repository storage.Repository, translator translation.GopherTranslator) http.HandlerFunc
-	TranslateSentence(repository storage.Repository, translator translation.GopherTranslator) http.HandlerFunc
-	TranslateHistory(repository storage.Repository) http.HandlerFunc
+	TranslateWord() http.HandlerFunc
+	TranslateSentence() http.HandlerFunc
+	TranslateHistory() http.HandlerFunc
 }
 
 // NewTranstatorHandler new TranstatorHandler

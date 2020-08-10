@@ -27,30 +27,30 @@ func CreateNewGopherTranslator() *NewGopherTranslator {
 // TranslateEnglishWordToGopher Translates english words to gopher alternatives
 func (gopherTranslator *NewGopherTranslator) TranslateEnglishWordToGopher(word string) string {
 	wordLength := len(word)
-	word = removeNonAlphabeticCharactersFromWord(word)
+	word = gopherTranslator.removeNonAlphabeticCharactersFromWord(word)
 
-	return translateWithLoops(word, wordLength, gopherTranslator.vowelsString)
+	return gopherTranslator.translateWithLoops(word, wordLength)
 }
 
 // TranslateEnglishSentenceToGopher Translates english sentences to gopher alternatives
 func (gopherTranslator *NewGopherTranslator) TranslateEnglishSentenceToGopher(sentence string) string {
 	wordsArray := strings.Split(sentence, " ")
 	firstWord := strings.ToLower(wordsArray[0])
-	firstWord = translateWithLoops(firstWord, len(firstWord), gopherTranslator.vowelsString)
+	firstWord = gopherTranslator.translateWithLoops(firstWord, len(firstWord))
 	firstWord = strings.Title(firstWord)
 	translatedWordsArray := []string{firstWord}
 	for _, word := range wordsArray[1:] {
-		word = removeNonAlphabeticCharactersFromWord(word)
+		word = gopherTranslator.removeNonAlphabeticCharactersFromWord(word)
 		wordLength := len(word)
-		wordTranslated := translateWithLoops(word, wordLength, gopherTranslator.vowelsString)
+		wordTranslated := gopherTranslator.translateWithLoops(word, wordLength)
 		translatedWordsArray = append(translatedWordsArray, wordTranslated)
 	}
-log.Print(translatedWordsArray)
+
 	return strings.Join(translatedWordsArray, " ") + string(sentence[len(sentence)-1])
 }
 
 // removeNonAlphabeticCharactersFromWord Removes non alphabetic characters from the provided string (word)
-func removeNonAlphabeticCharactersFromWord(word string) string {
+func (gopherTranslator *NewGopherTranslator) removeNonAlphabeticCharactersFromWord(word string) string {
 	reg, err := regexp.Compile("[^a-zA-Z]+")
 	if err != nil {
 		log.Print(err)
@@ -60,7 +60,7 @@ func removeNonAlphabeticCharactersFromWord(word string) string {
 }
 
 // translateWithLoops Translate using loops to catch any number of consonants at the beggining
-func translateWithLoops(word string, wordLength int, vowelsString string) string {
+func (gopherTranslator *NewGopherTranslator) translateWithLoops(word string, wordLength int) string {
 	out:
 	for index, value := range word {
 		switch value {
@@ -80,7 +80,7 @@ func translateWithLoops(word string, wordLength int, vowelsString string) string
 					break out
 				} else {
 					for key, val := range word[1:] {
-						if strings.Contains(vowelsString, string(val)) {
+						if strings.Contains(gopherTranslator.vowelsString, string(val)) {
 							word = (word[key+1:] + word[:key+1] + "ogo")
 							break out
 						}
@@ -94,8 +94,8 @@ func translateWithLoops(word string, wordLength int, vowelsString string) string
 }
 
 // translateWithoutLoops Translate without loops but catches limited number of consonants from the beggining of words
-func translateWithoutLoops(word string, wordLength int, vowelsString string) string {
-	if strings.Contains(vowelsString, string(word[0])) {
+func (gopherTranslator *NewGopherTranslator) translateWithoutLoops(word string, wordLength int) string {
+	if strings.Contains(gopherTranslator.vowelsString, string(word[0])) {
 		word = ("g" + word)
 	} else {
 		if wordLength > 1 {
@@ -103,8 +103,8 @@ func translateWithoutLoops(word string, wordLength int, vowelsString string) str
 				word = ("ge" + word)
 			} else {
 				if wordLength > 2 {
-					if !strings.Contains(vowelsString, string(word[1])) {
-						if (!strings.Contains(vowelsString, string(word[2])) || (word[2] == 'u' || word[2] == 'U')) {
+					if !strings.Contains(gopherTranslator.vowelsString, string(word[1])) {
+						if (!strings.Contains(gopherTranslator.vowelsString, string(word[2])) || (word[2] == 'u' || word[2] == 'U')) {
 							word = (word[3:] + word[:3] + "ogo")
 						} else {
 							word = (word[2:] + word[:2] + "ogo")
